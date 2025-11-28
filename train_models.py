@@ -23,7 +23,7 @@ feature_columns: List[str] = [
 
 target_column = "price_improvement"
 exchange_column = "lastmkt"
-min_rows_per_exchange = 200
+min_rows_per_exchange = 50
 
 
 def load_training_dataframe(path: str = "executions_with_nbbo.parquet") -> pd.DataFrame:
