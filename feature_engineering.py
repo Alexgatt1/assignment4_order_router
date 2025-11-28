@@ -27,6 +27,9 @@ quotes = quotes.sort_values("quote_time").reset_index(drop=True)
 quote_cols = ["Symbol", "quote_time", "ask_price", "bid_price", "bid_size", "ask_size"]
 merged_pd = pd.merge_asof(executions, quotes[quote_cols], by="Symbol", left_on="order_time", right_on="quote_time", direction="backward")
 buy_mask = merged_pd["Side"] == '1'
-merged_pd["price-improvement"] = np.where(buy_mask, merged_pd["ask_price"] - merged_pd["AvgPx"], merged_pd["AvgPx"] - merged_pd["bid_price"])
+merged_pd["price_improvement"] = np.where(buy_mask, merged_pd["ask_price"] - merged_pd["AvgPx"], merged_pd["AvgPx"] - merged_pd["bid_price"])
+merged_pd.to_parquet("executions_with_nbbo.parquet")
+
+
 
 print(merged_pd.head())
