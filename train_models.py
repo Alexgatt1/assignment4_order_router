@@ -41,7 +41,6 @@ def load_training_dataframe(path: str = "executions_with_nbbo.parquet") -> pd.Da
     )
 
     return dataframe
-dataframe.head()
 
 def build_grid_search_model() -> GridSearchCV:
     """
@@ -95,4 +94,36 @@ def train_models_for_all_exchanges(dataframe: pd.DataFrame) -> Dict[str, Pipelin
         )
 
         print(f"\nTraining model for exchange {exchange} on {len(group)} rows...")
+        grid_search = build_grid_search_model()
+        grid_search.fit(x_train, y_train)
 
+        best_model: Pipeline = grid_search.best_estimator_
+
+        predictions = best_model.predict(x_test)
+        r_squared = r2_score(y_test, predictions)
+        rmse = float(np.sqrt(mean_squared_error(y_test, predictions)))
+
+        print(f"Exchange {exchange}: R^2={r_squared:.4f}, RMSE={rmse:.6f}")
+        print(f"Best parameters: {grid_search.best_params_}")
+
+        models[exchange] = best_model
+    
+    return models
+
+def main() -> None:
+    """Train per-exchange regression models and save them to disk."""
+    dataframe = load_training_dataframe()
+    print(f"Loaded {len(dataframe)} rows for training.")
+
+    models = train_models_for_all_exchanges(dataframe)
+
+    if not models:
+        print("No models were trained — check data availability.")
+        return
+
+    joblib.dump(models, "exchange_price_improvement_models.joblib")
+    print(f"Saved {len(models)} models.")
+
+
+if __name__ == "__main__":
+    main()
