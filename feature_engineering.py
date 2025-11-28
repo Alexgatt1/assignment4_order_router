@@ -40,6 +40,10 @@ def main() -> None:
     executions_df["Symbol"] = executions_df["Symbol"].astype(str)
     quotes_df["Symbol"] = quotes_df["Symbol"].astype(str)
 
+    valid_symbols = set(quotes_df["Symbol"].unique())
+    executions_df = executions_df[executions_df["Symbol"].isin(valid_symbols)]
+
+
     market_open = time(9, 30)
     market_close = time(16, 0)
 
