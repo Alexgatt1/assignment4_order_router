@@ -73,3 +73,26 @@ def build_grid_search_model() -> GridSearchCV:
     )
 
     return grid_search
+
+def train_models_for_all_exchanges(dataframe: pd.DataFrame) -> Dict[str, Pipeline]:
+    """
+    Train individual models for each exchange (lastmkt).
+
+    Exchanges with fewer than min_rows_per_exchange rows are skipped.
+    """
+    models: Dict[str, Pipeline] = {}
+
+    for exchange, group in dataframe.groupby(exchange_column):
+        if len(group) < min_rows_per_exchange:
+            print(f"Skipping exchange {exchange}: only {len(group)} rows.")
+            continue
+
+        features = group[feature_columns]
+        target = group[target_column]
+
+        x_train, x_test, y_train, y_test = train_test_split(
+            features, target, test_size=0.2, random_state=42
+        )
+
+        print(f"\nTraining model for exchange {exchange} on {len(group)} rows...")
+
