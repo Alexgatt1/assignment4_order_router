@@ -50,11 +50,11 @@ def main() -> None:
     executions_df = executions_df[executions_market_mask]
 
     executions_df = executions_df.sort_values(
-        ["Symbol", "order_time"],
+        ["order_time", "Symbol"],
     ).reset_index(drop=True)
 
     quotes_df = quotes_df.sort_values(
-        ["Symbol", "quote_time"],
+        ["quote_time", "Symbol"],
     ).reset_index(drop=True)
 
     quote_columns = [
